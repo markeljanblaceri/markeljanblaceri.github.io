@@ -12,7 +12,7 @@ export const PROFILE = {
   institution: 'University of Padova',
   department: 'Department of Economics and Management',
   email: 'markeljan.blaceri@phd.unipd.it',
-  cv: '/Blaceri_CV.pdf',
+  cv: '/Curriculum_Vitae.pdf',
 };
 
 export const LINKS = {
