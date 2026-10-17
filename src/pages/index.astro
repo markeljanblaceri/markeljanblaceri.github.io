@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { PROFILE, LINKS } from "../config";
+
+const interests = [
+  "Monetary & fiscal policy shock identification",
+  "Macro-risk and tail behavior",
+  "Heterogeneous transmission of policy shocks",
+];
+---
+
+<BaseLayout sideBarActiveItemID="home">
+  <div class="pb-10 mt-5">
+    <div class="text-5xl font-bold">{PROFILE.name}</div>
+    <div class="text-2xl py-3 font-semibold opacity-80">{PROFILE.role}, {PROFILE.institution}</div>
+    <div class="py-2 text-lg leading-relaxed">
+      I am a PhD student in Economics at the University of Padova. My research is mainly in
+      applied macroeconomics.
+    </div>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a class="btn" href={PROFILE.cv} target="_blank">Download CV</a>
+      <a class="btn btn-outline" href={`mailto:${PROFILE.email}`}>Get in touch</a>
+    </div>
+  </div>
+
+  <div class="text-3xl w-full font-bold mb-4">Research interests</div>
+  <ul class="list-disc mx-6 mb-10 grid gap-2 text-lg">
+    {interests.map((i) => <li>{i}</li>)}
+  </ul>
+
+  <div class="text-3xl w-full font-bold mb-4">Latest work</div>
+  <div class="mb-10">
+    <a href="/research" class="text-xl font-semibold hover:underline">
+      Cutting the Flow: Geopolitical Disruptions to Russian Oil Supply and the Tails of Euro Area Inflation
+    </a>
+    <div class="opacity-75 mt-1">Working paper</div>
+  </div>
+
+  <div class="text-3xl w-full font-bold mb-4">Contact</div>
+  <div class="text-lg leading-relaxed">
+    {PROFILE.department}<br />
+    {PROFILE.institution}<br />
+    <a class="link" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+  </div>
+</BaseLayout>

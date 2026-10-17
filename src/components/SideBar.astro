@@ -1,0 +1,29 @@
+---
+import SideBarFooter from "./SideBarFooter.astro";
+import SideBarMenu from "./SideBarMenu.astro";
+import { PROFILE } from "../config";
+const { sideBarActiveItemID } = Astro.props;
+---
+
+<div class="drawer-side z-40">
+  <label for="my-drawer" class="drawer-overlay"></label>
+  <aside class="px-2 pt-2 h-auto min-h-full w-[19rem] bg-base-200 text-base-content flex flex-col">
+    <div class="w-fit mx-auto mt-5 mb-2">
+      <a href="/">
+        <div class="avatar transition ease-in-out hover:scale-[102%] block m-auto">
+          <div class="w-[8.5rem]">
+            <!-- To use a photo: put it in /public (e.g. profile.jpg) and change the src below -->
+            <img class="mask mask-circle" width="300" height="300" src="/profile.svg" alt={PROFILE.name} />
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="text-center mb-4 px-4">
+      <div class="font-bold text-lg">{PROFILE.name}</div>
+      <div class="text-sm opacity-75">{PROFILE.role}</div>
+      <div class="text-sm opacity-75">{PROFILE.institution}</div>
+    </div>
+    <SideBarMenu sideBarActiveItemID={sideBarActiveItemID} />
+    <SideBarFooter />
+  </aside>
+</div>

@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Add new papers to this list. Optional fields: coauthors, links (label + url).
+const workingPapers = [
+  {
+    title:
+      "Cutting the Flow: Geopolitical Disruptions to Russian Oil Supply and the Tails of Euro Area Inflation",
+    coauthors: "",
+    abstract:
+      "This paper shows that geopolitical disruptions to Russian oil supply reshape the distribution of euro area inflation, not just its mean. Combining an AI-based news index of oil supply disruptions with a quantile factor-augmented VAR estimated for 21 member states, I find that disruptions first lift the upper tail of inflation, generating upside risk on impact, before the median and lower tail follow. Responses differ across countries in line with their pre-war dependence on Russian energy. At their peak, the 2022–2023 disruptions added about two percentage points to euro area inflation. Before the invasion, disruptions were disinflationary, and only shocks of the magnitude seen in 2022 had effects well beyond proportional to their size.",
+    links: [] as { label: string; url: string }[],
+  },
+];
+---
+
+<BaseLayout title="Research | Markeljan Blacëri" sideBarActiveItemID="research">
+  <div class="text-4xl w-full font-bold mb-8">Research</div>
+
+  <div class="text-2xl w-full font-bold mb-5">Working Papers</div>
+  {
+    workingPapers.map((p) => (
+      <div class="mb-8">
+        <h3 class="text-xl font-semibold leading-snug">{p.title}</h3>
+        {p.coauthors && <div class="opacity-75 mt-1">with {p.coauthors}</div>}
+        {p.links.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-2">
+            {p.links.map((l) => (
+              <a class="btn btn-xs btn-outline" href={l.url} target="_blank">{l.label}</a>
+            ))}
+          </div>
+        )}
+        <details class="mt-3">
+          <summary class="cursor-pointer font-medium opacity-80">Abstract</summary>
+          <p class="mt-2 text-justify leading-relaxed">{p.abstract}</p>
+        </details>
+      </div>
+    ))
+  }
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const dept = "Department of Economics and Management, University of Padova";
+
+const years = [
+  {
+    year: "2025–2026",
+    courses: [
+      { course: "Applied Microeconomics and Strategic Behavior", level: "Master's Degree in Applied Economics", role: "Teaching Assistant and Co-instructor" },
+      { course: "Economics", level: "Preparatory course for all Master's Degree programs", role: "Lecturer" },
+    ],
+  },
+  {
+    year: "2024–2025",
+    courses: [
+      { course: "Applied Microeconomics and Strategic Behavior", level: "Master's Degree in Applied Economics", role: "Teaching Assistant" },
+      { course: "Microeconomia", level: "Bachelor's Degree in Economics", role: "Teaching Assistant" },
+    ],
+  },
+  {
+    year: "2023–2024",
+    courses: [
+      { course: "Applied Microeconomics and Strategic Behavior", level: "Master's Degree in Applied Economics", role: "Teaching Assistant" },
+    ],
+  },
+];
+
+const notes = [
+  { title: "Externalities and Public Goods", url: "https://drive.google.com/file/d/1SGcZRAusrMyFSJkkSuYAy7FwlLh2UkIv/view?usp=sharing" },
+  { title: "Taxation", url: "https://drive.google.com/file/d/1qGJ0J3iIk-CJmViOg85LEsf42eBkLOnB/view?usp=sharing" },
+];
+---
+
+<BaseLayout title="Teaching | Markeljan Blacëri" sideBarActiveItemID="teaching">
+  <div class="text-4xl w-full font-bold mb-2">Teaching</div>
+  <div class="opacity-75 mb-8">{dept}</div>
+
+  {
+    years.map((y) => (
+      <div class="mb-8">
+        <div class="text-2xl font-bold mb-3">A.Y. {y.year}</div>
+        <ul class="grid gap-3">
+          {y.courses.map((c) => (
+            <li class="border-l-2 border-primary pl-4">
+              <div class="font-semibold text-lg">{c.course}</div>
+              <div class="text-sm opacity-75">{c.level}</div>
+              <div class="text-sm">{c.role}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+
+  <div class="divider"></div>
+
+  <div class="text-2xl font-bold mb-2">Lecture Notes</div>
+  <div class="mb-4 opacity-80">A two-lecture crash course on Public Economics.</div>
+  <ol class="list-decimal mx-6 grid gap-2 text-lg">
+    {notes.map((n) => <li><a class="link" href={n.url} target="_blank">{n.title}</a></li>)}
+  </ol>
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TimeLineElement from "../components/cv/TimeLine.astro";
+import { PROFILE } from "../config";
+---
+
+<BaseLayout title="CV | Markeljan Blacëri" sideBarActiveItemID="cv">
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <div class="text-4xl font-bold">Curriculum Vitae</div>
+    <a class="btn" href={PROFILE.cv} target="_blank">Download full CV (PDF)</a>
+  </div>
+
+  <div class="text-2xl w-full font-bold mb-5">Current position</div>
+  <div class="time-line-container mb-10">
+    <TimeLineElement title="PhD Student in Economics" subtitle={`${PROFILE.department}, ${PROFILE.institution}`} />
+  </div>
+
+  <div class="text-2xl w-full font-bold mb-5">Teaching experience</div>
+  <div class="time-line-container mb-10">
+    <TimeLineElement title="Lecturer — Economics (preparatory course, Master's programs)" subtitle="A.Y. 2025–2026, University of Padova" />
+    <TimeLineElement title="Teaching Assistant and Co-instructor — Applied Microeconomics and Strategic Behavior" subtitle="A.Y. 2023–2026, University of Padova" />
+    <TimeLineElement title="Teaching Assistant — Microeconomia (Bachelor's)" subtitle="A.Y. 2024–2025, University of Padova" />
+  </div>
+
+  <div class="text-2xl w-full font-bold mb-5">Research interests</div>
+  <ul class="list-disc mx-6 mb-10 grid gap-2">
+    <li>Monetary & fiscal policy shock identification</li>
+    <li>Macro-risk and tail behavior</li>
+    <li>Heterogeneous transmission of policy shocks</li>
+  </ul>
+
+  <p class="opacity-75">Education, awards and presentations are listed in the full CV above.</p>
+</BaseLayout>
