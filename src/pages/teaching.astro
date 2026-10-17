@@ -32,10 +32,6 @@ const years = [
   },
 ];
 
-const notes = [
-  { title: "Externalities and Public Goods", url: "https://drive.google.com/file/d/1SGcZRAusrMyFSJkkSuYAy7FwlLh2UkIv/view?usp=sharing" },
-  { title: "Taxation", url: "https://drive.google.com/file/d/1qGJ0J3iIk-CJmViOg85LEsf42eBkLOnB/view?usp=sharing" },
-];
 ---
 
 <BaseLayout title="Teaching | Markeljan Blacëri" sideBarActiveItemID="teaching">
@@ -59,11 +55,4 @@ const notes = [
     ))
   }
 
-  <div class="divider"></div>
-
-  <div class="text-2xl font-bold mb-2">Lecture Notes</div>
-  <div class="mb-4 opacity-80">A two-lecture crash course on Public Economics.</div>
-  <ol class="list-decimal mx-6 grid gap-2 text-lg">
-    {notes.map((n) => <li><a class="link" href={n.url} target="_blank">{n.title}</a></li>)}
-  </ol>
 </BaseLayout>
