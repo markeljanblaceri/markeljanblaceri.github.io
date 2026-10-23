@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Add one entry per series. Put the files in /public/data/ and link them as "/data/<file name>".
+// Fields:
+//   name         – what the series is (e.g. "Oil supply news shocks")
+//   description  – one or two sentences on what was updated
+//   coverage     – sample period and frequency (e.g. "1975M1–2026M9, monthly")
+//   reference    – the original paper the series comes from: citation text + optional link
+//   files        – download buttons (label + url)
+type Dataset = {
+  name: string;
+  description: string;
+  coverage?: string;
+  reference: { text: string; url?: string };
+  files: { label: string; url: string }[];
+};
+
+const datasets: Dataset[] = [];
+
+const lastUpdated = "";
+---
+
+<BaseLayout title="Data | Markeljan Blacëri" sideBarActiveItemID="data">
+  <div class="text-4xl w-full font-bold mb-2">Data</div>
+  <p class="text-lg leading-relaxed mb-8 opacity-90">
+    Updated series of instruments and shocks from the literature, extended to recent data. If you use them, please
+    cite the original paper listed with each series.
+    {lastUpdated && <span class="block text-sm opacity-75 mt-2">Last updated: {lastUpdated}</span>}
+  </p>
+
+  {
+    datasets.map((d) => (
+      <div class="mb-8 border-l-2 border-primary pl-4">
+        <h3 class="text-xl font-semibold leading-snug">{d.name}</h3>
+        {d.coverage && <div class="text-sm opacity-75 mt-1">{d.coverage}</div>}
+        <p class="mt-2 leading-relaxed">{d.description}</p>
+        <div class="mt-2 text-sm">
+          <span class="font-semibold">Original reference: </span>
+          {d.reference.url ? (
+            <a class="link" href={d.reference.url} target="_blank">{d.reference.text}</a>
+          ) : (
+            d.reference.text
+          )}
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          {d.files.map((f) => (
+            <a class="btn btn-xs btn-outline" href={f.url} download>{f.label}</a>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</BaseLayout>
