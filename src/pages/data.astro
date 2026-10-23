@@ -16,7 +16,19 @@ type Dataset = {
   files: { label: string; url: string }[];
 };
 
-const datasets: Dataset[] = [];
+const datasets: Dataset[] = [
+  {
+    name: "Informationally-robust monetary policy instrument (US)",
+    description:
+      "Updated series of the informationally-robust instrument for monetary policy shocks, extended to recent data following the methodology of the original paper.",
+    coverage: "", // TODO: sample period and frequency
+    reference: {
+      text: "Miranda-Agrippino, S., and G. Ricco (2021). \"The Transmission of Monetary Policy Shocks.\" American Economic Journal: Macroeconomics, 13(3): 74–107.",
+      url: "https://www.aeaweb.org/articles?id=10.1257/mac.20180124",
+    },
+    files: [], // TODO: add file(s) in /public/data/
+  },
+];
 
 const lastUpdated = "";
 ---
