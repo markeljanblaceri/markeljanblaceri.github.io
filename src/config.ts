@@ -21,3 +21,6 @@ export const LINKS = {
   github: 'https://github.com/markeljanblaceri',
   x: 'https://x.com/blaceri_econ',
 };
+
+// Set to true to show the Data page in the sidebar (and let search engines index it).
+export const SHOW_DATA_PAGE = false;

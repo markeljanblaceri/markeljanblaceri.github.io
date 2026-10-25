@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { SHOW_DATA_PAGE } from "../config";
 
 // Add one entry per series. Put the files in /public/data/ and link them as "/data/<file name>".
 // Fields:
@@ -36,7 +37,7 @@ const datasets: Dataset[] = [
 const lastUpdated = "October 2026";
 ---
 
-<BaseLayout title="Data | Markeljan Blacëri" sideBarActiveItemID="data">
+<BaseLayout title="Data | Markeljan Blacëri" sideBarActiveItemID="data" noindex={!SHOW_DATA_PAGE}>
   <div class="text-4xl w-full font-bold mb-2">Data</div>
   <p class="text-lg leading-relaxed mb-8 opacity-90">
     Updated series of instruments and shocks from the literature, extended to recent data. If you use them, please
