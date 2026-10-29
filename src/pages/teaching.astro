@@ -3,11 +3,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const dept = "Department of Economics and Management, University of Padova";
 
-const years = [
+// Optional per course: lectures (title + url of a PDF in /public/teaching/...).
+type Course = { course: string; level: string; role: string; lectures?: { title: string; url: string }[] };
+
+const years: { year: string; courses: Course[] }[] = [
   {
     year: "2026–2027",
     courses: [
-      { course: "Econometrics", level: "Preparatory course for all Master's Degree programs", role: "Lecturer" },
+      {
+        course: "Econometrics",
+        level: "Preparatory course for all Master's Degree programs",
+        role: "Lecturer",
+        lectures: [
+          { title: "The Simple Linear Regression Model", url: "/teaching/econometrics/Lecture_1_Simple_Linear_Regression.pdf" },
+          { title: "The Multiple Linear Regression Model", url: "/teaching/econometrics/Lecture_2_Multiple_Linear_Regression.pdf" },
+          { title: "Inference", url: "/teaching/econometrics/Lecture_3_Inference.pdf" },
+          { title: "Heteroskedasticity", url: "/teaching/econometrics/Lecture_4_Heteroskedasticity.pdf" },
+          { title: "Difference Equations", url: "/teaching/econometrics/Lecture_5_Difference_Equations.pdf" },
+        ],
+      },
     ],
   },
   {
@@ -48,6 +62,16 @@ const years = [
               <div class="font-semibold text-lg">{c.course}</div>
               <div class="text-sm opacity-75">{c.level}</div>
               <div class="text-sm">{c.role}</div>
+              {c.lectures && c.lectures.length > 0 && (
+                <div class="mt-2">
+                  <div class="text-sm font-semibold mb-1">Lecture notes</div>
+                  <ol class="list-decimal ml-5 grid gap-1">
+                    {c.lectures.map((l) => (
+                      <li class="text-sm"><a class="link-blue" href={l.url} target="_blank">{l.title}</a></li>
+                    ))}
+                  </ol>
+                </div>
+              )}
             </li>
           ))}
         </ul>
