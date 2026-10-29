@@ -8,5 +8,5 @@
 .sidebar-blue .menu li > a.sidebar-active { background-color: rgba(255, 255, 255, 0.2); }
 
 /* Blue text links (paper, replication files) */
-.link-blue { color: #1d4ed8; font-weight: 500; }
-.link-blue:hover { text-decoration: underline; }
+.link-blue { color: #1d4ed8; font-size: 0.875rem; text-decoration: underline; text-underline-offset: 2px; }
+.link-blue:hover { color: #1e40af; }
