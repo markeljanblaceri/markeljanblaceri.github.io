@@ -42,7 +42,7 @@ const datasets: Dataset[] = [
   {
     name: "Fiscal news proxies from the Survey of Professional Forecasters (US)",
     description:
-      "Updated series of government spending news and forecast-error proxies built from SPF forecasts of real federal government consumption expenditures and gross investment, following Ramey (2011), Forni and Gambetti (2016) and Ricco (2015). One sheet per paper.",
+      "Updated series of government spending news and forecast-error proxies built from SPF forecasts of real federal government consumption expenditures and gross investment, following Ramey (2011), Forni and Gambetti (2016) and Ricco (2015). One sheet per paper; the construction is explained in the research note.",
     coverage: "1981Q3–2026Q3, quarterly",
     references: [
       {
@@ -69,16 +69,17 @@ const datasets: Dataset[] = [
           { name: "F(1,4)", def: "Expected growth over the next four quarters: Σ_{h=1..4} E*_t g_{t+h}." },
           { name: "n(1,3)", def: "News over the next three quarters: F_t(1,3) − F_{t−1}(2,4)." },
           { name: "(mean) / (median)", def: "Built from the mean / median SPF level forecasts." },
-          { name: "(median of growth)", def: "Built from the median of individual growth forecasts." },
         ],
       },
       {
         group: "Ricco (2015)",
         items: [
-          { name: "N(0)", def: "News on the current quarter: agg_i [E*i_t g_t − E*i_{t−1} g_t]." },
-          { name: "N(1,3)", def: "News on the next three quarters: Σ_{h=1..3} agg_i [E*i_t g_{t+h} − E*i_{t−1} g_{t+h}]." },
           { name: "M", def: "Nowcast error: g_t − agg_i E*i_t g_t." },
+          { name: "N(0)", def: "News on the current quarter: agg_i [E*i_t g_t − E*i_{t−1} g_t]." },
+          { name: "N(1,3) (mean)", def: "News on the next three quarters: Σ_{h=1..3} mean_i [E*i_t g_{t+h} − E*i_{t−1} g_{t+h}]." },
+          { name: "N(1,3) (median)", def: "Median over forecasters of the summed revisions: median_i Σ_{h=1..3} [E*i_t g_{t+h} − E*i_{t−1} g_{t+h}]." },
           { name: "(mean) / (median)", def: "agg_i = cross-sectional mean / median over forecasters i." },
+          { name: "Sample", def: "Revisions use forecasters responding in two consecutive surveys." },
         ],
       },
     ],
@@ -88,10 +89,8 @@ const datasets: Dataset[] = [
       "Dates refer to the survey quarter t, except FE, which is dated by the quarter being forecast.",
     ],
     files: [
-      { label: "Excel (all sheets)", url: "/data/fiscal_news_proxies.xlsx" },
-      { label: "CSV: Ramey", url: "/data/fiscal_news_proxies_Ramey.csv" },
-      { label: "CSV: Forni-Gambetti", url: "/data/fiscal_news_proxies_Forni-Gambetti.csv" },
-      { label: "CSV: Ricco", url: "/data/fiscal_news_proxies_Ricco.csv" },
+      { label: "Excel", url: "/data/fiscal_news_proxies.xlsx" },
+      { label: "Research Note", url: "/data/Fiscal_Proxies.pdf" },
     ],
   },
 ];
@@ -157,10 +156,14 @@ const lastUpdated = "October 2026";
             </div>
           </details>
         )}
-        <div class="flex flex-wrap gap-2 mt-3">
-          {d.files.map((f) => (
-            <a class="btn btn-xs btn-outline" href={f.url} download>{f.label}</a>
-          ))}
+        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+          {d.files.map((f) =>
+            f.url.endsWith(".pdf") ? (
+              <a class="link-blue" href={f.url} target="_blank">{f.label}</a>
+            ) : (
+              <a class="link-blue" href={f.url} download>{f.label}</a>
+            )
+          )}
         </div>
       </div>
     ))
