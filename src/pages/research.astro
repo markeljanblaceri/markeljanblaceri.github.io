@@ -10,7 +10,7 @@ const workingPapers = [
     abstract:
       "This paper shows that geopolitical disruptions to Russian oil supply reshape the distribution of euro area inflation, not just its mean. Combining an AI-based news index of oil supply disruptions with a quantile factor-augmented VAR estimated for 21 member states, I find that disruptions first lift the upper tail of inflation, generating upside risk on impact, before the median and lower tail follow. Responses differ across countries in line with their pre-war dependence on Russian energy. At their peak, the 2022–2023 disruptions added about two percentage points to euro area inflation. Before the invasion, disruptions were disinflationary, and only shocks of the magnitude seen in 2022 had effects well beyond proportional to their size.",
     links: [
-      { label: "PDF", url: "/Paper_on_Geopolitical_Russian_Oil_Supply_Disruptions.pdf" },
+      { label: "Paper", url: "/Paper_on_Geopolitical_Russian_Oil_Supply_Disruptions.pdf" },
       { label: "Replication files", url: "/Replication_Files_Oil_GPR.zip" },
     ] as { label: string; url: string }[],
   },
@@ -27,9 +27,9 @@ const workingPapers = [
         <h3 class="text-xl font-semibold leading-snug">{p.title}</h3>
         {p.coauthors && <div class="opacity-75 mt-1">with {p.coauthors}</div>}
         {p.links.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-2">
+          <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
             {p.links.map((l) => (
-              <a class="btn btn-xs btn-outline" href={l.url} target="_blank">{l.label}</a>
+              <a class="link-blue" href={l.url} target="_blank">{l.label}</a>
             ))}
           </div>
         )}
