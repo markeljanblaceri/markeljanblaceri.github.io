@@ -1,0 +1,212 @@
+---
+// Interactive time-series chart (SVG, no external libraries).
+// - one or more "views"; buttons switch between them (each view has its own y-axis)
+// - a view shows bars (one series) or lines (one or more series, with a legend)
+// - hover / tap shows the date and every series value at that point
+type Series = { name: string; color: string; values: (number | null)[] };
+type View = { key: string; kind: "bar" | "line"; series: Series[]; yLabel?: string };
+type Control = { options: { key: string; label: string }[] };
+export interface Props {
+  t: string[];
+  x: number[];
+  views: View[];
+  controls?: Control[]; // view key = selected option keys joined by "|"
+  defaultView?: string;
+  xMin: number;
+  xMax: number;
+  decimals?: number;
+  caption?: string;
+  height?: number;
+}
+const { t, x, views, controls = [], defaultView, xMin, xMax, decimals = 3, caption = "", height = 230 } = Astro.props;
+const active = defaultView ?? views[0].key;
+const activeParts = active.split("|");
+
+const W = 820, H = height;
+const xt: number[] = [];
+for (let y = Math.ceil(xMin / 5) * 5; y <= xMax; y += 5) xt.push(y);
+
+function build(v: View) {
+  const m = { top: 12, right: 8, bottom: 34, left: v.yLabel ? 86 : 66 };
+  const pw = W - m.left - m.right, ph = H - m.top - m.bottom;
+  const all = v.series.flatMap((s) => s.values.filter((z): z is number => z !== null));
+  const vmin = Math.min(0, ...all), vmax = Math.max(0, ...all);
+  const raw = (vmax - vmin) / 4 || 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((s) => s >= raw) ?? 10 * mag;
+  const y0 = Math.floor(vmin / step) * step, y1 = Math.ceil(vmax / step) * step;
+  const yt: number[] = [];
+  for (let z = y0; z <= y1 + step / 2; z += step) yt.push(+z.toFixed(10));
+  const sx = (q: number) => m.left + ((q - xMin) / (xMax - xMin)) * pw;
+  const sy = (q: number) => m.top + ((y1 - q) / (y1 - y0)) * ph;
+  const dec = Math.max(0, -Math.floor(Math.log10(step)) + (Math.abs(step / mag - 2.5) < 1e-9 ? 1 : 0));
+  const fmt = (q: number) => (q === 0 ? "0" : q.toFixed(dec).replace("-", "−"));
+  const slot = x.length > 1 ? sx(x[1]) - sx(x[0]) : 4;
+  const bw = Math.max(1, slot * 0.62);
+  const bars = v.kind === "bar"
+    ? x.map((q, i) => {
+        const val = v.series[0].values[i];
+        if (val === null) return null;
+        const top = sy(Math.max(0, val)), bot = sy(Math.min(0, val));
+        return { x: sx(q) - bw / 2, y: top, w: bw, h: Math.max(0.6, bot - top) };
+      }).filter(Boolean)
+    : [];
+  const paths = v.kind === "line"
+    ? v.series.map((s) => {
+        let d = "", pen = false;
+        s.values.forEach((val, i) => {
+          if (val === null) { pen = false; return; }
+          d += `${pen ? "L" : "M"}${sx(x[i]).toFixed(1)} ${sy(val).toFixed(1)}`;
+          pen = true;
+        });
+        return { d, color: s.color };
+      })
+    : [];
+  const hits = x.map((q, i) => ({
+    x: sx(q) - slot / 2, w: slot, cx: sx(q),
+    vals: JSON.stringify(v.series.map((s) => s.values[i])),
+    cy: Math.min(...v.series.map((s) => (s.values[i] === null ? H : sy(s.values[i] as number)))),
+    t: t[i],
+  }));
+  return { m, pw, ph, yt, sy, sx, fmt, bars, paths, hits };
+}
+const built = views.map((v) => ({ v, g: build(v) }));
+---
+
+<figure class="viz-chart mt-3" data-decimals={decimals}>
+  {controls.length > 0 && (
+    <div class="flex flex-wrap gap-x-4 gap-y-2 mb-2">
+      {controls.map((c, ci) => (
+        <div class="viz-seg" role="group" data-control={ci}>
+          {c.options.map((o) => (
+            <button type="button" class="viz-btn" data-opt={o.key} aria-pressed={activeParts[ci] === o.key ? "true" : "false"}>{o.label}</button>
+          ))}
+        </div>
+      ))}
+    </div>
+  )}
+  {built.map(({ v, g }) => (
+    <div class="viz-view relative" data-view={v.key} hidden={v.key !== active}>
+      {v.series.length > 1 && (
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm mb-1">
+          {v.series.map((s) => (
+            <span class="inline-flex items-center gap-1.5"><span class="viz-swatch" style={`background:${s.color}`}></span>{s.name}</span>
+          ))}
+        </div>
+      )}
+      <div class="relative">
+        <svg viewBox={`0 0 ${W} ${H}`} class="w-full h-auto block" role="img" aria-label={caption || "Chart"} data-names={JSON.stringify(v.series.map((s) => s.name))} data-colors={JSON.stringify(v.series.map((s) => s.color))}>
+          {g.yt.map((q) => (
+            <g>
+              <line x1={g.m.left} x2={W - g.m.right} y1={g.sy(q)} y2={g.sy(q)} class={q === 0 ? "viz-zero" : "viz-grid"} />
+              <text x={g.m.left - 8} y={g.sy(q)} dy="0.35em" text-anchor="end" class="viz-tick">{g.fmt(q)}</text>
+            </g>
+          ))}
+          {xt.map((y) => <text x={g.sx(y)} y={H - 6} text-anchor="middle" class="viz-tick">{y}</text>)}
+          {v.yLabel && (
+            <text transform={`translate(16 ${g.m.top + g.ph / 2}) rotate(-90)`} text-anchor="middle" class="viz-tick">{v.yLabel}</text>
+          )}
+          {g.bars.map((b: any) => <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={v.series[0].color} />)}
+          {g.paths.map((p) => (
+            <g>
+              <path d={p.d} fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="0.9" />
+              <path d={p.d} fill="none" stroke={p.color} stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+            </g>
+          ))}
+          <line class="viz-cross" x1="0" x2="0" y1={g.m.top} y2={g.m.top + g.ph} />
+          {g.hits.map((h) => (
+            <rect x={h.x} y={g.m.top} width={h.w} height={g.ph} class="viz-hit" data-t={h.t} data-vals={h.vals} data-cx={h.cx} data-cy={h.cy} />
+          ))}
+        </svg>
+        <div class="viz-tip" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  ))}
+  {caption && <figcaption class="text-xs opacity-70 mt-1">{caption}</figcaption>}
+</figure>
+
+<style>
+  .viz-grid { stroke: #ebeae6; stroke-width: 1; }
+  .viz-zero { stroke: #8a8984; stroke-width: 1; }
+  .viz-tick { fill: #52514e; font-size: 13px; font-family: inherit; }
+  .viz-hit { fill: transparent; cursor: crosshair; }
+  .viz-cross { stroke: #8a8984; stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; }
+  .viz-swatch { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .viz-seg { display: inline-flex; border: 1px solid #d6d5cf; border-radius: 6px; overflow: hidden; }
+  .viz-btn { font-size: 13px; padding: 3px 10px; background: #fff; color: #52514e; border-left: 1px solid #d6d5cf; cursor: pointer; }
+  .viz-btn:first-child { border-left: 0; }
+  .viz-btn:hover { background: #f3f4f6; }
+  .viz-btn[aria-pressed="true"] { background: #1e3a5f; color: #fff; }
+  .viz-btn:focus-visible { outline: 2px solid #2a78d6; outline-offset: -2px; }
+  .viz-tip {
+    position: absolute; pointer-events: none; opacity: 0; transform: translate(-50%, -110%);
+    background: #fff; color: #0b0b0b; border: 1px solid #e2e1dc; border-radius: 6px;
+    padding: 4px 8px; font-size: 12px; line-height: 1.4; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transition: opacity 80ms; z-index: 5;
+  }
+  .viz-tip .row { display: flex; align-items: center; gap: 6px; }
+  .viz-tip .sw { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+  @media (max-width: 640px) {
+    .viz-tick { font-size: 24px; }
+  }
+</style>
+
+<script>
+  function initDataCharts() {
+    document.querySelectorAll<HTMLElement>(".viz-chart").forEach((fig) => {
+      if (fig.dataset.ready) return;
+      fig.dataset.ready = "1";
+      const dec = Number(fig.dataset.decimals || 3);
+      const fmt = (v: number | null) => (v === null ? "–" : v.toFixed(dec).replace("-", "−"));
+      const views = [...fig.querySelectorAll<HTMLElement>(".viz-view")];
+      const hideAll = () => views.forEach((vw) => {
+        vw.querySelector<HTMLElement>(".viz-tip")!.style.opacity = "0";
+        vw.querySelector<SVGLineElement>(".viz-cross")!.style.opacity = "0";
+      });
+
+      // switching views
+      const segs = [...fig.querySelectorAll<HTMLElement>(".viz-seg")];
+      segs.forEach((seg) => seg.querySelectorAll<HTMLButtonElement>(".viz-btn").forEach((b) => {
+        b.addEventListener("click", () => {
+          seg.querySelectorAll(".viz-btn").forEach((o) => o.setAttribute("aria-pressed", "false"));
+          b.setAttribute("aria-pressed", "true");
+          const key = segs.map((s) => s.querySelector('[aria-pressed="true"]')!.getAttribute("data-opt")).join("|");
+          hideAll();
+          views.forEach((vw) => (vw.hidden = vw.dataset.view !== key));
+        });
+      }));
+
+      // tooltips
+      views.forEach((vw) => {
+        const svg = vw.querySelector("svg")!;
+        const tip = vw.querySelector<HTMLElement>(".viz-tip")!;
+        const cross = vw.querySelector<SVGLineElement>(".viz-cross")!;
+        const names: string[] = JSON.parse(svg.dataset.names || "[]");
+        const colors: string[] = JSON.parse(svg.dataset.colors || "[]");
+        const show = (r: SVGRectElement) => {
+          const vb = svg.viewBox.baseVal, box = svg.getBoundingClientRect();
+          const k = box.width / vb.width;
+          const cx = Number(r.dataset.cx), cy = Number(r.dataset.cy);
+          const vals: (number | null)[] = JSON.parse(r.dataset.vals || "[]");
+          cross.setAttribute("x1", String(cx)); cross.setAttribute("x2", String(cx)); cross.style.opacity = "1";
+          tip.innerHTML = `<b>${r.dataset.t}</b>` + (vals.length === 1
+            ? `&nbsp; ${fmt(vals[0])}`
+            : vals.map((v, i) => `<div class="row"><span class="sw" style="background:${colors[i]}"></span>${names[i]}&nbsp; ${fmt(v)}</div>`).join(""));
+          const w = tip.offsetWidth || 120;
+          tip.style.left = `${Math.min(Math.max(cx * k, w / 2 + 2), box.width - w / 2 - 2)}px`;
+          tip.style.top = `${Math.max(cy * k, tip.offsetHeight + 4)}px`;
+          tip.style.opacity = "1";
+        };
+        const hide = () => { tip.style.opacity = "0"; cross.style.opacity = "0"; };
+        vw.querySelectorAll<SVGRectElement>(".viz-hit").forEach((r) => {
+          r.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") show(r); });
+          r.addEventListener("pointerdown", () => show(r));
+        });
+        svg.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") hide(); });
+      });
+      document.addEventListener("pointerdown", (e) => { if (!fig.contains(e.target as Node)) hideAll(); });
+    });
+  }
+  document.addEventListener("astro:page-load", initDataCharts);
+  initDataCharts();
+</script>

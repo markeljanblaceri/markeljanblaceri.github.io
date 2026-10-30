@@ -42,8 +42,6 @@ ws = openpyxl.load_workbook("public/data/MAR_IVs.xlsx", data_only=True).active
 rows = [r for r in list(ws.iter_rows(values_only=True))[1:] if r[0] is not None]
 hdr = [c for c in next(ws.iter_rows(values_only=True))]
 ci = hdr.index("MPI")
-json.dump([{"t": f"{int(r[0])}M{int(r[1])}", "x": int(r[0]) + (int(r[1]) - 0.5) / 12, "v": round(r[ci], 6)} for r in rows],
-          open("src/data/charts/monetary_policy.json", "w"))
 chart([dt.date(int(r[0]), int(r[1]), 15) for r in rows], [r[ci] for r in rows], 25, "",
       "public/data/fig/monetary_policy.svg", dt.date(1990, 7, 1), dt.date(2021, 7, 1))
 
@@ -54,9 +52,37 @@ ci = rows[0].index("FE (mean)")
 def q2d(s):
     y, q = s.split("Q"); return dt.date(int(y), 3 * int(q) - 1, 15)
 data = [(q2d(r[0]), r[ci]) for r in rows[1:] if r[0] and r[ci] is not None]
-json.dump([{"t": r[0], "x": int(r[0][:4]) + (int(r[0][-1]) - 0.5) / 4, "v": round(r[ci], 4)}
-           for r in rows[1:] if r[0] and r[ci] is not None],
-          open("src/data/charts/fiscal_news.json", "w"))
 chart([d for d, _ in data], [v for _, v in data], 70, "annualized %",
       "public/data/fig/fiscal_news.svg", dt.date(1981, 1, 1), dt.date(2027, 1, 1))
 print("figures written")
+
+
+# ---- data for the interactive charts on the Data page --------------------------------
+def rnd(v, k):
+    return None if v is None else round(float(v), k)
+
+
+def export_monthly(path, sheet, out, k=6):
+    ws = openpyxl.load_workbook(path, data_only=True)[sheet] if sheet else openpyxl.load_workbook(path, data_only=True).active
+    rows = list(ws.iter_rows(values_only=True))
+    hdr = list(rows[0]); body = [r for r in rows[1:] if r[0] is not None]
+    cols = {h: [rnd(r[i], k) for r in body] for i, h in enumerate(hdr) if h not in ("year", "month")}
+    json.dump({"t": [f"{int(r[0])}M{int(r[1])}" for r in body],
+               "x": [round(int(r[0]) + (int(r[1]) - 0.5) / 12, 4) for r in body],
+               "cols": cols}, open(out, "w"))
+
+
+def export_quarterly(path, sheet, out, k=4):
+    ws = openpyxl.load_workbook(path, data_only=True)[sheet]
+    rows = list(ws.iter_rows(values_only=True))
+    hdr = list(rows[0]); body = [r for r in rows[1:] if r[0]]
+    cols = {h: [rnd(r[i], k) for r in body] for i, h in enumerate(hdr) if i > 0}
+    json.dump({"t": [r[0] for r in body],
+               "x": [round(int(r[0][:4]) + (int(r[0][-1]) - 0.5) / 4, 4) for r in body],
+               "cols": cols}, open(out, "w"))
+
+
+export_monthly("public/data/MAR_IVs.xlsx", None, "src/data/charts/monetary_policy.json")
+export_quarterly("public/data/fiscal_news_proxies.xlsx", "Forni-Gambetti", "src/data/charts/fiscal_forni_gambetti.json")
+export_quarterly("public/data/fiscal_news_proxies.xlsx", "Ricco", "src/data/charts/fiscal_ricco.json")
+print("chart data written")

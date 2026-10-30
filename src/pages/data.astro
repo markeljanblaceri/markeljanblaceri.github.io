@@ -1,9 +1,57 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SHOW_DATA_PAGE } from "../config";
-import BarChart from "../components/charts/BarChart.astro";
+import DataChart from "../components/charts/DataChart.astro";
 import mpData from "../data/charts/monetary_policy.json";
-import fiscalData from "../data/charts/fiscal_news.json";
+import fgData from "../data/charts/fiscal_forni_gambetti.json";
+import riccoData from "../data/charts/fiscal_ricco.json";
+
+// ---- charts (data come from scripts/make_data_figures.py) ----
+const BLUE = "#2a78d6", ORANGE = "#eb6834";
+const AGGS = [{ key: "mean", label: "Mean" }, { key: "median", label: "Median" }];
+type Src = { t: string[]; x: number[]; cols: Record<string, (number | null)[]> };
+// one bar view per (measure, mean/median); `col` maps a measure key to its Excel column prefix
+function barViews(src: Src, measures: { key: string; col: string }[], yLabel: string) {
+  return measures.flatMap((m) =>
+    AGGS.map((a) => ({
+      key: `${m.key}|${a.key}`,
+      kind: "bar" as const,
+      yLabel,
+      series: [{ name: `${m.col} (${a.key})`, color: BLUE, values: src.cols[`${m.col} (${a.key})`] }],
+    }))
+  );
+}
+const mpChart = {
+  t: mpData.t, x: mpData.x, xMin: 1990.6, xMax: 2021.4, decimals: 3,
+  views: [{ key: "both", kind: "line" as const, series: [
+    { name: "MPI", color: BLUE, values: mpData.cols["MPI"] },
+    { name: "INFO", color: ORANGE, values: mpData.cols["INFO"] },
+  ] }],
+  caption: "Monthly. Hover over or tap the chart to see the values.",
+};
+const fiscalCharts = [
+  {
+    title: "Forni and Gambetti (2016)",
+    t: fgData.t, x: fgData.x, xMin: 1981, xMax: 2027, decimals: 2,
+    controls: [
+      { options: [{ key: "news", label: "News, next 3 quarters" }, { key: "exp", label: "Expected growth, next 4 quarters" }] },
+      { options: AGGS },
+    ],
+    defaultView: "news|mean",
+    views: barViews(fgData as Src, [{ key: "news", col: "n(1,3)" }, { key: "exp", col: "F(1,4)" }], "annualized %"),
+  },
+  {
+    title: "Ricco (2015)",
+    t: riccoData.t, x: riccoData.x, xMin: 1981, xMax: 2027, decimals: 2,
+    controls: [
+      { options: [{ key: "news13", label: "News, next 3 quarters" }, { key: "news0", label: "News, current quarter" }, { key: "nowcast", label: "Nowcast error" }] },
+      { options: AGGS },
+    ],
+    defaultView: "news13|mean",
+    caption: "Quarterly. Use the buttons to switch series; hover over or tap a chart to see the values.",
+    views: barViews(riccoData as Src, [{ key: "news13", col: "N(1,3)" }, { key: "news0", col: "N(0)" }, { key: "nowcast", col: "M" }], "annualized %"),
+  },
+];
 
 // Add one entry per series. Put the files in /public/data/ and link them as "/data/<file name>".
 // Fields:
@@ -13,7 +61,7 @@ import fiscalData from "../data/charts/fiscal_news.json";
 //   references   – optional: the original paper(s) the series come from: citation text + optional link
 //   variables    – optional list of variable definitions, shown in a collapsible box
 //   notes        – optional extra lines shown under the variable definitions (units, dating, …)
-//   chart        – optional interactive chart: data (from scripts/make_data_figures.py), x range, y label, caption
+//   charts       – optional interactive charts (see the chart definitions above)
 //   files        – download links (label + url)
 type Ref = { text: string; url?: string };
 type Dataset = {
@@ -24,7 +72,7 @@ type Dataset = {
   references?: Ref[];
   variables?: { group?: string; items: { name: string; def: string }[] }[];
   notes?: string[];
-  chart?: { data: { t: string; x: number; v: number }[]; xMin: number; xMax: number; yLabel?: string; decimals?: number; caption: string };
+  charts?: any[]; // DataChart props (+ optional title), defined above
   files: { label: string; url: string }[];
 };
 
@@ -35,7 +83,7 @@ const datasets: Dataset[] = [
     description:
       "Updated series of the informationally-robust instrument for US monetary policy shocks of Miranda-Agrippino and Ricco (2021).",
     coverage: "1991M1–2020M12, monthly",
-    chart: { data: mpData, xMin: 1990.6, xMax: 2021.4, decimals: 3, caption: "Monetary policy instrument (MPI), monthly. Hover over or tap a bar to see its value." },
+    charts: [mpChart],
     files: [
       { label: "Excel", url: "/data/MAR_IVs.xlsx" },
       // { label: "Research Note", url: "/data/MAR_IVs_Research_Note.pdf" },  // add when the note is ready
@@ -47,7 +95,7 @@ const datasets: Dataset[] = [
     description:
       "Updated proxies for US government spending shocks built from the Survey of Professional Forecasters: the forecast error of Ramey (2011), the expectation and news measures of Forni and Gambetti (2016), and the news and nowcast-error measures of Ricco (2015). The construction of each series and the references are explained in the research note.",
     coverage: "1981Q3–2026Q3, quarterly",
-    chart: { data: fiscalData, xMin: 1981, xMax: 2027, yLabel: "annualized %", decimals: 2, caption: "Forecast error of Ramey (2011), mean SPF forecast, quarterly. Other series are in the Excel file." },
+    charts: fiscalCharts,
     files: [
       { label: "Excel", url: "/data/fiscal_news_proxies.xlsx" },
       { label: "Research Note", url: "/data/Fiscal_Proxies.pdf" },
@@ -72,9 +120,12 @@ const lastUpdated = "October 2026";
         <h3 class="text-xl font-semibold leading-snug">{d.name}</h3>
         {d.coverage && <div class="text-sm opacity-75 mt-1">{d.coverage}</div>}
         <p class="mt-2 leading-relaxed">{d.description}</p>
-        {d.chart && (
-          <BarChart data={d.chart.data} xMin={d.chart.xMin} xMax={d.chart.xMax} yLabel={d.chart.yLabel} decimals={d.chart.decimals} caption={d.chart.caption} />
-        )}
+        {d.charts && d.charts.map((c) => (
+          <div class="mt-4">
+            {c.title && <div class="text-sm font-semibold">{c.title}</div>}
+            <DataChart {...c} />
+          </div>
+        ))}
         {d.references && d.references.length > 0 && (
         <div class="mt-2 text-sm">
           <span class="font-semibold">{d.references.length > 1 ? "Original references:" : "Original reference:"}</span>
