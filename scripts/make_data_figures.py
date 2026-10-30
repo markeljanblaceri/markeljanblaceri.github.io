@@ -101,5 +101,19 @@ def export_meetings(path, out, k=4):
                "cols": cols}, open(out, "w"))
 
 
-export_meetings("public/data/RR_shocks.xlsx", "src/data/charts/romer_romer.json")
+
+
+def export_monthly_dates(path, sheet, out, k=4):
+    """Monthly sheet whose first column holds dates (first day of each month)."""
+    ws = openpyxl.load_workbook(path, data_only=True)[sheet]
+    rows = list(ws.iter_rows(values_only=True))
+    hdr = list(rows[0]); body = [r for r in rows[1:] if r[0] is not None]
+    cols = {h: [rnd(r[i], k) for r in body] for i, h in enumerate(hdr) if i > 0}
+    json.dump({"t": [f"{r[0].year}M{r[0].month}" for r in body],
+               "x": [round(r[0].year + (r[0].month - 0.5) / 12, 4) for r in body],
+               "cols": cols}, open(out, "w"))
+
+
+# Romer and Romer: the chart shows the monthly sheet (the Excel file also has the meeting-level sheet)
+export_monthly_dates("public/data/RR_shocks.xlsx", "monthly", "src/data/charts/romer_romer.json")
 print("Romer-Romer chart data written")

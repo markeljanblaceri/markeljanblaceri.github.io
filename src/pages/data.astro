@@ -32,8 +32,8 @@ const mpChart = {
 };
 const rrChart = {
   t: rrData.t, x: rrData.x, xMin: 1968.5, xMax: 2021.4, decimals: 2,
-  views: [{ key: "rr", kind: "bar" as const, series: [{ name: "Romer and Romer shock", color: BLUE, values: rrData.cols["rr_fixed"] }] }],
-  caption: "One bar per FOMC meeting. Hover over or tap the chart to see the values.",
+  views: [{ key: "rr", kind: "bar" as const, series: [{ name: "Romer and Romer shock", color: BLUE, values: rrData.cols["rr_monthly"] }] }],
+  caption: "Monthly. Hover over or tap the chart to see the values.",
 };
 const fiscalCharts = [
   {
@@ -99,8 +99,8 @@ const datasets: Dataset[] = [
     id: "romer-romer",
     name: "Romer and Romer monetary policy shocks (US)",
     description:
-      "Updated series of the narrative monetary policy shocks of Romer and Romer (2004), at the frequency of FOMC meetings.",
-    coverage: "March 1969 – December 2020, by FOMC meeting",
+      "Updated series of the narrative monetary policy shocks of Romer and Romer (2004). The Excel file contains the shocks both by FOMC meeting and at the monthly frequency.",
+    coverage: "1969M3–2020M12, monthly and by FOMC meeting",
     charts: [rrChart],
     files: [{ label: "Excel", url: "/data/RR_shocks.xlsx" }],
   },
