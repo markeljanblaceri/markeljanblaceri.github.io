@@ -1,6 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SHOW_DATA_PAGE } from "../config";
+import BarChart from "../components/charts/BarChart.astro";
+import mpData from "../data/charts/monetary_policy.json";
+import fiscalData from "../data/charts/fiscal_news.json";
 
 // Add one entry per series. Put the files in /public/data/ and link them as "/data/<file name>".
 // Fields:
@@ -10,7 +13,7 @@ import { SHOW_DATA_PAGE } from "../config";
 //   references   – optional: the original paper(s) the series come from: citation text + optional link
 //   variables    – optional list of variable definitions, shown in a collapsible box
 //   notes        – optional extra lines shown under the variable definitions (units, dating, …)
-//   figure       – optional small chart (made by scripts/make_data_figures.py) + one-line caption
+//   chart        – optional interactive chart: data (from scripts/make_data_figures.py), x range, y label, caption
 //   files        – download links (label + url)
 type Ref = { text: string; url?: string };
 type Dataset = {
@@ -21,7 +24,7 @@ type Dataset = {
   references?: Ref[];
   variables?: { group?: string; items: { name: string; def: string }[] }[];
   notes?: string[];
-  figure?: { src: string; caption: string };
+  chart?: { data: { t: string; x: number; v: number }[]; xMin: number; xMax: number; yLabel?: string; decimals?: number; caption: string };
   files: { label: string; url: string }[];
 };
 
@@ -32,7 +35,7 @@ const datasets: Dataset[] = [
     description:
       "Updated series of the informationally-robust instrument for US monetary policy shocks of Miranda-Agrippino and Ricco (2021).",
     coverage: "1991M1–2020M12, monthly",
-    figure: { src: "/data/fig/monetary_policy.svg", caption: "Monetary policy instrument (MPI), monthly." },
+    chart: { data: mpData, xMin: 1990.6, xMax: 2021.4, decimals: 3, caption: "Monetary policy instrument (MPI), monthly. Hover over or tap a bar to see its value." },
     files: [
       { label: "Excel", url: "/data/MAR_IVs.xlsx" },
       // { label: "Research Note", url: "/data/MAR_IVs_Research_Note.pdf" },  // add when the note is ready
@@ -44,7 +47,7 @@ const datasets: Dataset[] = [
     description:
       "Updated proxies for US government spending shocks built from the Survey of Professional Forecasters: the forecast error of Ramey (2011), the expectation and news measures of Forni and Gambetti (2016), and the news and nowcast-error measures of Ricco (2015). The construction of each series and the references are explained in the research note.",
     coverage: "1981Q3–2026Q3, quarterly",
-    figure: { src: "/data/fig/fiscal_news.svg", caption: "Forecast error of Ramey (2011), mean SPF forecast, quarterly. Other series are in the Excel file." },
+    chart: { data: fiscalData, xMin: 1981, xMax: 2027, yLabel: "annualized %", decimals: 2, caption: "Forecast error of Ramey (2011), mean SPF forecast, quarterly. Other series are in the Excel file." },
     files: [
       { label: "Excel", url: "/data/fiscal_news_proxies.xlsx" },
       { label: "Research Note", url: "/data/Fiscal_Proxies.pdf" },
@@ -69,11 +72,8 @@ const lastUpdated = "October 2026";
         <h3 class="text-xl font-semibold leading-snug">{d.name}</h3>
         {d.coverage && <div class="text-sm opacity-75 mt-1">{d.coverage}</div>}
         <p class="mt-2 leading-relaxed">{d.description}</p>
-        {d.figure && (
-          <figure class="mt-3">
-            <img src={d.figure.src} alt={`Chart: ${d.figure.caption}`} loading="lazy" class="w-full h-auto" width="820" height="210" />
-            <figcaption class="text-xs opacity-70 mt-1">{d.figure.caption}</figcaption>
-          </figure>
+        {d.chart && (
+          <BarChart data={d.chart.data} xMin={d.chart.xMin} xMax={d.chart.xMax} yLabel={d.chart.yLabel} decimals={d.chart.decimals} caption={d.chart.caption} />
         )}
         {d.references && d.references.length > 0 && (
         <div class="mt-2 text-sm">
