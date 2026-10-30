@@ -1,8 +1,18 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Add new papers to this list. Optional fields: coauthors, links (label + url).
+// Add new papers at the TOP of this list (newest first). Optional fields: coauthors, links (label + url).
 const workingPapers = [
+  {
+    title: "Fiscal Information in Monetary Surprises",
+    coauthors: "",
+    abstract:
+      "Are informationally robust monetary policy instruments contaminated by the Fed’s view of fiscal policy? Miranda-Agrippino and Ricco (2021) purge high-frequency surprises of the Fed’s macroeconomic forecasts, but note that the instrument would remain contaminated if the Fed also responded to fiscal variables. I test this by adding the Greenbook forecasts of the federal surplus and of the high-employment surplus, extended to 2020, to their information set. The fiscal forecasts do not predict the surprises, the instrument is essentially unchanged, and the responses to a monetary policy shock in a proxy VAR differ little. The Fed’s fiscal outlook leaves no detectable trace in the surprises, and the informationally robust instrument needs no fiscal correction.",
+    links: [
+      { label: "Paper", url: "/Fiscal_Information_in_Monetary_Surprises.pdf" },
+      { label: "Updated IVs", url: "/data/#monetary-policy" },
+    ],
+  },
   {
     title:
       "Cutting the Flow: Geopolitical Disruptions to Russian Oil Supply and the Tails of Euro Area Inflation",
@@ -13,16 +23,6 @@ const workingPapers = [
       { label: "Paper", url: "/Paper_on_Geopolitical_Russian_Oil_Supply_Disruptions.pdf" },
       { label: "Replication files", url: "/Replication_Files_Oil_GPR.zip" },
     ] as { label: string; url: string }[],
-  },
-  {
-    title: "Fiscal Information in Monetary Surprises",
-    coauthors: "",
-    abstract:
-      "Are informationally robust monetary policy instruments contaminated by the Fed’s view of fiscal policy? Miranda-Agrippino and Ricco (2021) purge high-frequency surprises of the Fed’s macroeconomic forecasts, but note that the instrument would remain contaminated if the Fed also responded to fiscal variables. I test this by adding the Greenbook forecasts of the federal surplus and of the high-employment surplus, extended to 2020, to their information set. The fiscal forecasts do not predict the surprises, the instrument is essentially unchanged, and the responses to a monetary policy shock in a proxy VAR differ little. The Fed’s fiscal outlook leaves no detectable trace in the surprises, and the informationally robust instrument needs no fiscal correction.",
-    links: [
-      { label: "Paper", url: "/Fiscal_Information_in_Monetary_Surprises.pdf" },
-      { label: "Updated IVs", url: "/data/#monetary-policy" },
-    ],
   },
 ];
 ---
