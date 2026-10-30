@@ -14,6 +14,16 @@ const workingPapers = [
       { label: "Replication files", url: "/Replication_Files_Oil_GPR.zip" },
     ] as { label: string; url: string }[],
   },
+  {
+    title: "Fiscal Information in Monetary Surprises",
+    coauthors: "",
+    abstract:
+      "Are informationally robust monetary policy instruments contaminated by the Fed’s view of fiscal policy? Miranda-Agrippino and Ricco (2021) purge high-frequency surprises of the Fed’s macroeconomic forecasts, but note that the instrument would remain contaminated if the Fed also responded to fiscal variables. I test this by adding the Greenbook forecasts of the federal surplus and of the high-employment surplus, extended to 2020, to their information set. The fiscal forecasts do not predict the surprises, the instrument is essentially unchanged, and the responses to a monetary policy shock in a proxy VAR differ little. The Fed’s fiscal outlook leaves no detectable trace in the surprises, and the informationally robust instrument needs no fiscal correction.",
+    links: [
+      { label: "Paper", url: "/Fiscal_Information_in_Monetary_Surprises.pdf" },
+      { label: "Updated IVs", url: "/data/#monetary-policy" },
+    ],
+  },
 ];
 ---
 
@@ -29,7 +39,7 @@ const workingPapers = [
         {p.links.length > 0 && (
           <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
             {p.links.map((l) => (
-              <a class="link-blue" href={l.url} target="_blank">{l.label}</a>
+              <a class="link-blue" href={l.url} target={l.url.startsWith("/data") ? undefined : "_blank"}>{l.label}</a>
             ))}
           </div>
         )}

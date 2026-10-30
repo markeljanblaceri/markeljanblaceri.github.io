@@ -13,6 +13,7 @@ import { SHOW_DATA_PAGE } from "../config";
 //   files        – download buttons (label + url)
 type Ref = { text: string; url?: string };
 type Dataset = {
+  id?: string;
   name: string;
   description: string;
   coverage?: string;
@@ -24,6 +25,7 @@ type Dataset = {
 
 const datasets: Dataset[] = [
   {
+    id: "monetary-policy",
     name: "Informationally-robust monetary policy instrument (US)",
     description:
       "Updated series of the informationally-robust instrument for US monetary policy shocks of Miranda-Agrippino and Ricco (2021). A research note explaining the construction and the references will follow.",
@@ -34,6 +36,7 @@ const datasets: Dataset[] = [
     ],
   },
   {
+    id: "fiscal-news",
     name: "Fiscal news proxies from the Survey of Professional Forecasters (US)",
     description:
       "Updated proxies for US government spending shocks built from the Survey of Professional Forecasters: the forecast error of Ramey (2011), the expectation and news measures of Forni and Gambetti (2016), and the news and nowcast-error measures of Ricco (2015). The construction of each series and the references are explained in the research note.",
@@ -58,7 +61,7 @@ const lastUpdated = "October 2026";
 
   {
     datasets.map((d) => (
-      <div class="mb-10 border-l-2 border-primary pl-4">
+      <div id={d.id} class="mb-10 border-l-2 border-primary pl-4 scroll-mt-20">
         <h3 class="text-xl font-semibold leading-snug">{d.name}</h3>
         {d.coverage && <div class="text-sm opacity-75 mt-1">{d.coverage}</div>}
         <p class="mt-2 leading-relaxed">{d.description}</p>

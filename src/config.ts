@@ -23,4 +23,4 @@ export const LINKS = {
 };
 
 // Set to true to show the Data page in the sidebar (and let search engines index it).
-export const SHOW_DATA_PAGE = false;
+export const SHOW_DATA_PAGE = true;
