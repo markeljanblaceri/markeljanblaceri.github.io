@@ -86,3 +86,20 @@ export_monthly("public/data/MAR_IVs.xlsx", None, "src/data/charts/monetary_polic
 export_quarterly("public/data/fiscal_news_proxies.xlsx", "Forni-Gambetti", "src/data/charts/fiscal_forni_gambetti.json")
 export_quarterly("public/data/fiscal_news_proxies.xlsx", "Ricco", "src/data/charts/fiscal_ricco.json")
 print("chart data written")
+
+
+def export_meetings(path, out, k=4):
+    ws = openpyxl.load_workbook(path, data_only=True).active
+    rows = list(ws.iter_rows(values_only=True))
+    hdr = list(rows[0]); body = [r for r in rows[1:] if r[0] is not None]
+    def frac(d):
+        start = dt.datetime(d.year, 1, 1); end = dt.datetime(d.year + 1, 1, 1)
+        return d.year + (d - start).total_seconds() / (end - start).total_seconds()
+    cols = {h: [rnd(r[i], k) for r in body] for i, h in enumerate(hdr) if i > 0}
+    json.dump({"t": [r[0].strftime("%Y-%m-%d") for r in body],
+               "x": [round(frac(r[0]), 4) for r in body],
+               "cols": cols}, open(out, "w"))
+
+
+export_meetings("public/data/RR_shocks.xlsx", "src/data/charts/romer_romer.json")
+print("Romer-Romer chart data written")

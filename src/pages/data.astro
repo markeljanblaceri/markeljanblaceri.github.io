@@ -5,6 +5,7 @@ import DataChart from "../components/charts/DataChart.astro";
 import mpData from "../data/charts/monetary_policy.json";
 import fgData from "../data/charts/fiscal_forni_gambetti.json";
 import riccoData from "../data/charts/fiscal_ricco.json";
+import rrData from "../data/charts/romer_romer.json";
 
 // ---- charts (data come from scripts/make_data_figures.py) ----
 const BLUE = "#2a78d6", ORANGE = "#eb6834";
@@ -28,6 +29,11 @@ const mpChart = {
     { name: "INFO", color: ORANGE, values: mpData.cols["INFO"] },
   ] }],
   caption: "Monthly. Hover over or tap the chart to see the values.",
+};
+const rrChart = {
+  t: rrData.t, x: rrData.x, xMin: 1968.5, xMax: 2021.4, decimals: 2,
+  views: [{ key: "rr", kind: "bar" as const, series: [{ name: "Romer and Romer shock", color: BLUE, values: rrData.cols["rr_fixed"] }] }],
+  caption: "One bar per FOMC meeting. Hover over or tap the chart to see the values.",
 };
 const fiscalCharts = [
   {
@@ -88,6 +94,15 @@ const datasets: Dataset[] = [
       { label: "Excel", url: "/data/MAR_IVs.xlsx" },
       // { label: "Research Note", url: "/data/MAR_IVs_Research_Note.pdf" },  // add when the note is ready
     ],
+  },
+  {
+    id: "romer-romer",
+    name: "Romer and Romer monetary policy shocks (US)",
+    description:
+      "Updated series of the narrative monetary policy shocks of Romer and Romer (2004), at the frequency of FOMC meetings.",
+    coverage: "March 1969 – December 2020, by FOMC meeting",
+    charts: [rrChart],
+    files: [{ label: "Excel", url: "/data/RR_shocks.xlsx" }],
   },
   {
     id: "fiscal-news",

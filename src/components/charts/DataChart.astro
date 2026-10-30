@@ -41,7 +41,10 @@ function build(v: View) {
   const sy = (q: number) => m.top + ((y1 - q) / (y1 - y0)) * ph;
   const dec = Math.max(0, -Math.floor(Math.log10(step)) + (Math.abs(step / mag - 2.5) < 1e-9 ? 1 : 0));
   const fmt = (q: number) => (q === 0 ? "0" : q.toFixed(dec).replace("-", "−"));
-  const slot = x.length > 1 ? sx(x[1]) - sx(x[0]) : 4;
+  // average spacing (works for regular and irregular dates, e.g. FOMC meetings)
+  const slot = x.length > 1 ? (sx(x[x.length - 1]) - sx(x[0])) / (x.length - 1) : 4;
+  // hover area of each point: halfway to its neighbours
+  const edge = (i: number) => (i <= 0 ? sx(x[0]) - slot / 2 : i >= x.length ? sx(x[x.length - 1]) + slot / 2 : (sx(x[i - 1]) + sx(x[i])) / 2);
   const bw = Math.max(1, slot * 0.62);
   const bars = v.kind === "bar"
     ? x.map((q, i) => {
@@ -63,7 +66,7 @@ function build(v: View) {
       })
     : [];
   const hits = x.map((q, i) => ({
-    x: sx(q) - slot / 2, w: slot, cx: sx(q),
+    x: edge(i), w: edge(i + 1) - edge(i), cx: sx(q),
     vals: JSON.stringify(v.series.map((s) => s.values[i])),
     cy: Math.min(...v.series.map((s) => (s.values[i] === null ? H : sy(s.values[i] as number)))),
     t: t[i],
