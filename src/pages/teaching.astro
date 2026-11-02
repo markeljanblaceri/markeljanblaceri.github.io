@@ -27,7 +27,15 @@ const years: { year: string; courses: Course[] }[] = [
   {
     year: "2025–2026",
     courses: [
-      { course: "Applied Microeconomics and Strategic Behavior", level: "Master's Degree in Applied Economics", role: "Teaching Assistant and Co-instructor" },
+      {
+        course: "Applied Microeconomics and Strategic Behavior",
+        level: "Master's Degree in Applied Economics",
+        role: "Teaching Assistant and Co-instructor",
+        lectures: [
+          { title: "Externalities & Public Goods", url: "/teaching/applied-micro/Lecture_1_Externalities_and_Public_Goods.pdf" },
+          { title: "Taxation", url: "/teaching/applied-micro/Lecture_2_Taxation.pdf" },
+        ],
+      },
       { course: "Economics", level: "Preparatory course for all Master's Degree programs", role: "Lecturer" },
     ],
   },
