@@ -1,5 +1,5 @@
 ---
-import { PROFILE, SHOW_DATA_PAGE } from "../config";
+import { SHOW_DATA_PAGE } from "../config";
 const { sideBarActiveItemID } = Astro.props;
 const activeClass = "sidebar-active";
 ---
@@ -10,7 +10,6 @@ const activeClass = "sidebar-active";
     {SHOW_DATA_PAGE && <li><a class="py-3 text-base" id="data" href="/data">Data</a></li>}
     <li><a class="py-3 text-base" id="teaching" href="/teaching">Teaching</a></li>
     <li><a class="py-3 text-base" id="cv" href="/cv">CV</a></li>
-    <li><a class="py-3 text-base" href={`mailto:${PROFILE.email}`}>Contact</a></li>
 </ul>
 
 <script define:vars={{ sideBarActiveItemID: sideBarActiveItemID, activeClass: activeClass }}>
