@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Add new items at the TOP of each list (newest first). Optional fields: coauthors, links (label + url).
-type Paper = { title: string; coauthors: string; abstract: string; links: { label: string; url: string }[] };
+// Add new items at the TOP of each list (newest first). Optional fields: coauthors, abstract, links (label + url).
+type Paper = { title: string; coauthors?: string; abstract?: string; links?: { label: string; url: string }[] };
 
 const workingPapers: Paper[] = [
   {
@@ -30,6 +30,10 @@ const researchNotes: Paper[] = [
     ],
   },
 ];
+
+const workInProgress: Paper[] = [
+  { title: "Conditional Inflation-at-Risk" },
+];
 ---
 
 <BaseLayout title="Research | Markeljan Blacëri" sideBarActiveItemID="research">
@@ -39,6 +43,7 @@ const researchNotes: Paper[] = [
     [
       { heading: "Working Papers", items: workingPapers },
       { heading: "Research Notes", items: researchNotes },
+      { heading: "Work in Progress", items: workInProgress },
     ]
       .filter((sec) => sec.items.length > 0)
       .map((sec, si) => (
@@ -48,17 +53,19 @@ const researchNotes: Paper[] = [
             <div class="mb-8">
               <h3 class="text-xl font-semibold leading-snug">{p.title}</h3>
               {p.coauthors && <div class="opacity-75 mt-1">with {p.coauthors}</div>}
-              {p.links.length > 0 && (
+              {p.links && p.links.length > 0 && (
                 <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                   {p.links.map((l) => (
                     <a class="link-blue" href={l.url} target={l.url.startsWith("/data") ? undefined : "_blank"}>{l.label}</a>
                   ))}
                 </div>
               )}
-              <details class="mt-3">
-                <summary class="cursor-pointer font-medium opacity-80">Abstract</summary>
-                <p class="mt-2 text-justify leading-relaxed">{p.abstract}</p>
-              </details>
+              {p.abstract && (
+                <details class="mt-3">
+                  <summary class="cursor-pointer font-medium opacity-80">Abstract</summary>
+                  <p class="mt-2 text-justify leading-relaxed">{p.abstract}</p>
+                </details>
+              )}
             </div>
           ))}
         </section>
