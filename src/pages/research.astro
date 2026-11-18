@@ -6,6 +6,12 @@ type Paper = { title: string; coauthors?: string; abstract?: string; links?: { l
 
 const workingPapers: Paper[] = [
   {
+    title: "Conditional Inflation-at-Risk",
+    abstract:
+      "This paper introduces Conditional Inflation-at-Risk (CoIaR), a measure of how the tails of the future inflation distribution change when a given economic variable is in a stressed state. The measure attributes inflation tail risk to a specific source and decomposes it into the sensitivity of a given inflation quantile to that source and the risk in the source itself. I apply the framework to the labor market, using labor market tightness as the conditioning variable. Using monthly U.S. data, I find that the labor market is primarily a source of downside inflation risk. A slack labor market lowers the 10th percentile of core inflation one year ahead by about half a percentage point, while a tight labor market leaves the upper tail essentially unchanged. Upside inflation risk is instead driven by inflation persistence and expectations. These results suggest that labor market slack is informative about the risk of undershooting the inflation target, but provides limited warning of upside inflation risk.",
+    links: [{ label: "Paper", url: "/Conditional_Inflation_at_Risk.pdf" }],
+  },
+  {
     title:
       "Cutting the Flow: Geopolitical Disruptions to Russian Oil Supply and the Tails of Euro Area Inflation",
     coauthors: "",
@@ -32,7 +38,6 @@ const researchNotes: Paper[] = [
 ];
 
 const workInProgress: Paper[] = [
-  { title: "Conditional Inflation-at-Risk" },
 ];
 ---
 
